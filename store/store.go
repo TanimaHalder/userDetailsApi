@@ -30,5 +30,5 @@ func (d DB) GetUserByName(u *types.User, name string) types.User {
 		}
 	}
 
-	return types.UsersList[p-1]
+	return types.UsersList[p]
 }

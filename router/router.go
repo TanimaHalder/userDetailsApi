@@ -1,18 +1,19 @@
 package router
 
 import (
-	"net/http"
 	"userDetailsApi/handlers/Users"
 	"userDetailsApi/store"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(db *store.DB) *mux.Router {
-	r := mux.NewRouter()
+func NewRouter(db *store.DB) *gin.Engine {
+	r := gin.Default()
 
 	userH := Users.New(db)
-	r.HandleFunc("/UserDetails", userH.NewUser).Methods(http.MethodPost)
-	r.HandleFunc("/fetchUserByName", userH.GetUserByName).Methods(http.MethodPost)
+	r.POST("/UserDetails", userH.NewUserAdd)
+
+	r.POST("/fetchUserByName", userH.GetUserByName)
+
 	return r
 }

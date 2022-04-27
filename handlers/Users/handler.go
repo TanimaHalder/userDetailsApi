@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"userDetailsApi/store"
 	"userDetailsApi/types"
+	"github.com/gin-gonic/gin"
 )
 
 type us struct {
@@ -14,39 +15,40 @@ type us struct {
 func New(db *store.DB) *us {
 	return &us{db: db}
 }
-func (u us) NewUser(rw http.ResponseWriter, r *http.Request) {
+
+func (u us) NewUserAdd(c *gin.Context) {
 
 	var user types.User
-	if err := user.DecodeFromJSON(r.Body); err != nil {
-		http.Error(rw, "Failed to decode", http.StatusBadRequest)
+	if err := user.DecodeFromJSON(c.Request.Body); err != nil {
+		http.Error(c.Writer, "Failed to decode", http.StatusBadRequest)
 		return
 	}
 
 	if err := u.db.InsertNewUser(&user); err != nil {
-		http.Error(rw, "Failed to insert", http.StatusBadRequest)
+		http.Error(c.Writer, "Failed to insert", http.StatusBadRequest)
 		return
 	}
 
 	fmt.Printf("%#v", u.db.GetAllUsers())
-	rw.WriteHeader(http.StatusCreated)
-	user.EncodeToJSON(rw)
+	c.Writer.WriteHeader(http.StatusCreated)
+	user.EncodeToJSON(c.Writer)
 	return
 
 }
 
-func (u us) GetUserByName(rw http.ResponseWriter, r *http.Request) {
+func (u us) GetUserByName(c *gin.Context) {
 
 	var user types.User
-	if err := user.DecodeFromJSON(r.Body); err != nil {
-		http.Error(rw, "Failed to decode", http.StatusBadRequest)
+	if err := user.DecodeFromJSON(c.Request.Body); err != nil {
+		http.Error(c.Writer, "Failed to decode", http.StatusBadRequest)
 		return
 	}
 
 	user = u.db.GetUserByName(&user, string(user.Name))
 
 	fmt.Printf("%#v", u.db.GetAllUsers())
-	rw.WriteHeader(http.StatusCreated)
-	user.EncodeToJSON(rw)
+	c.Writer.WriteHeader(http.StatusCreated)
+	user.EncodeToJSON(c.Writer)
 	return
 
 }
